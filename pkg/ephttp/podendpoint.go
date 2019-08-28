@@ -7,8 +7,6 @@ import (
     "time"
 
     "k8s.io/client-go/kubernetes"
-
-    "strings"
 )
 
 // PodMetricsList : PodMetricsList
@@ -16,29 +14,40 @@ type PodMetricsList struct {
     Kind       string `json:"kind"`
     APIVersion string `json:"apiVersion"`
     Metadata   struct {
-        SelfLink string `json:"selfLink"`
+        Name              string    `json:"name"`
+        Namespace         string    `json:"namespace"`
+        SelfLink          string    `json:"selfLink"`
+        UID               string    `json:"uid"`
+	Resourceversion   string    `json:"resourceVersion"`
+	CreationTimestamp time.Time `json:"creationTimestamp"`
+	Labels struct {
+		App string `json:"app"`
+	} `json:"labels"`
+        Annotations struct {
+          Endpointk8slastchange string `json:"endpoints.kubernetes.io/last-change-trigger-time"`
+	}
     } `json:"metadata"`
-    Items []struct {
-        Metadata struct {
-            Name              string    `json:"name"`
-            Namespace         string    `json:"namespace"`
-            SelfLink          string    `json:"selfLink"`
-            CreationTimestamp time.Time `json:"creationTimestamp"`
-        } `json:"metadata"`
-        Timestamp  time.Time `json:"timestamp"`
-        Window     string    `json:"window"`
-        Containers []struct {
-            Name  string `json:"name"`
-            Usage struct {
-                CPU    string `json:"cpu"`
-                Memory string `json:"memory"`
-            } `json:"usage"`
-        } `json:"containers"`
-    } `json:"items"`
+    Subsets []struct {
+        Addresses []struct {
+		IP        string `json:"ip"`
+		Nodename  string `json:"nodeName"`
+                Targetref struct  {
+                    Kind            string `json:"kind"`
+		    Namespace       string `json:"namespace"`
+		    Name            string `json:"name"`
+		    UID             string `json:"uid"`
+		    Resourceversion string `json:"resourceversion"`
+	    } `json:"targetRef"`
+        } `json:"addresses"`
+	Ports []struct {
+		Port int `json:"port"`
+		Protocol string `json:"protocol"`
+	} `json:"ports"`
+    } `json:"subsets"`
 }
 
 func getMetrics(clientset *kubernetes.Clientset, pods *PodMetricsList) error {
-    data, err := clientset.RESTClient().Get().AbsPath("apis/metrics.k8s.io/v1beta1/pods").DoRaw()
+    data, err := clientset.RESTClient().Get().AbsPath("api/v1/namespaces/credenciamento/endpoints/credenciamento-validacao-telefone").DoRaw()
     if err != nil {
         return err
     }
@@ -68,15 +77,12 @@ func StartUp(kubeconfig string) {
        panic(err.Error())
     }
 
-    for _, m := range pods.Items {
+    for _, m := range pods.Subsets {
 
-       for _, c := range m.Containers {
+       for _, c := range m.Addresses {
 
-          s_mem_in_kb := strings.TrimSuffix(c.Usage.Memory, "Ki")
-          s_cpu_in_n := strings.TrimSuffix(c.Usage.CPU, "n")
-
-          fmt.Printf(s_mem_in_kb + "\n")
-          fmt.Printf(s_cpu_in_n + "\n")
+          fmt.Printf(c.IP + "\n")
+          fmt.Printf(c.Nodename + "\n")
 
        }
     }
