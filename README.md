@@ -8,7 +8,7 @@ Usage of ./bin/k8s-svc-endpoint:
     	(optional) absolute path to the kubeconfig file (default "/home/carlosfe/.kube/config")
 
 
-./bin/k8s-svc-endpoint --kubeconfig ~/projects/kubeland/zubernetes/.kube/conf
+./bin/k8s-svc-endpoint --kubeconfig ~/projects/kubeland/hzubernetes/.kube/conf --service-name api/v1/namespaces/credenciamento/endpoints/credenciamento-validacao-telefone
 
 ---------
 #metrics:

@@ -16,12 +16,13 @@ func main() {
     } else {
 		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
     }
+    var svc = flag.String("service-name", "", "The service name.")
 
     flag.Parse()
 
     log.Printf("----------------------")
     log.Printf("getting svc endpoints:")
-    ipsep := ephttp.StartUp(*kubeconfig)
+    ipsep := ephttp.StartUp(*kubeconfig, *svc)
 
     log.Printf("----------------------")
     log.Printf("listing svc endpoints:")
