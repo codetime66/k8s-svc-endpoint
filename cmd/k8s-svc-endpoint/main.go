@@ -4,6 +4,7 @@ import (
     "flag"
     "path/filepath"
     "os"
+    "log"
 
     "github.com/codetime66/k8s-svc-endpoint/pkg/ephttp"
 )
@@ -18,7 +19,15 @@ func main() {
 
     flag.Parse()
 
-    ephttp.StartUp(*kubeconfig)
+    log.Printf("----------------------")
+    log.Printf("getting svc endpoints:")
+    ipsep := ephttp.StartUp(*kubeconfig)
+
+    log.Printf("----------------------")
+    log.Printf("listing svc endpoints:")
+    for _, ipep := range ipsep {
+       log.Printf(ipep)
+    }
 }
 
 func homeDir() string {

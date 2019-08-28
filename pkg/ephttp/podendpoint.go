@@ -3,14 +3,13 @@ package ephttp
 import (
     "k8s.io/client-go/tools/clientcmd"
     "encoding/json"
-    "fmt"
+    "log"
     "time"
 
     "k8s.io/client-go/kubernetes"
 )
 
-// PodMetricsList : PodMetricsList
-type PodMetricsList struct {
+type PodEndpointList struct {
     Kind       string `json:"kind"`
     APIVersion string `json:"apiVersion"`
     Metadata   struct {
@@ -46,7 +45,7 @@ type PodMetricsList struct {
     } `json:"subsets"`
 }
 
-func getMetrics(clientset *kubernetes.Clientset, pods *PodMetricsList) error {
+func getEndpoints(clientset *kubernetes.Clientset, pods *PodEndpointList) error {
     data, err := clientset.RESTClient().Get().AbsPath("api/v1/namespaces/credenciamento/endpoints/credenciamento-validacao-telefone").DoRaw()
     if err != nil {
         return err
@@ -55,7 +54,7 @@ func getMetrics(clientset *kubernetes.Clientset, pods *PodMetricsList) error {
     return err
 }
 
-func StartUp(kubeconfig string) {
+func StartUp(kubeconfig string) []string {
 
     // use the current context in kubeconfig
     config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
@@ -68,23 +67,24 @@ func StartUp(kubeconfig string) {
         panic(err.Error())
     }
 
-
-    fmt.Printf("Performing an api http request - Current Unix Time: %v\n", time.Now().Unix())
-
-    var pods PodMetricsList
-    err = getMetrics(clientset, &pods)
+    var pods PodEndpointList
+    err = getEndpoints(clientset, &pods)
     if err != nil {
        panic(err.Error())
     }
 
+    var ipsep []string
     for _, m := range pods.Subsets {
 
        for _, c := range m.Addresses {
 
-          fmt.Printf(c.IP + "\n")
-          fmt.Printf(c.Nodename + "\n")
+          log.Printf(c.IP)
+          log.Printf(c.Nodename)
+
+          ipsep = append(ipsep, c.IP)
 
        }
     }
 
+    return ipsep
 }
