@@ -45,9 +45,8 @@ type PodEndpointList struct {
     } `json:"subsets"`
 }
 
-func getEndpoints(clientset *kubernetes.Clientset, pods *PodEndpointList, svc string) error {
-    //data, err := clientset.RESTClient().Get().AbsPath("api/v1/namespaces/credenciamento/endpoints/credenciamento-validacao-telefone").DoRaw()
-    data, err := clientset.RESTClient().Get().AbsPath(svc).DoRaw()
+func getEndpoints(clientset *kubernetes.Clientset, pods *PodEndpointList, svc string, ns string) error {
+    data, err := clientset.RESTClient().Get().AbsPath("api/v1/namespaces/" + ns + "/endpoints/" + svc).DoRaw()
     if err != nil {
         return err
     }
@@ -55,7 +54,7 @@ func getEndpoints(clientset *kubernetes.Clientset, pods *PodEndpointList, svc st
     return err
 }
 
-func StartUp(kubeconfig string, svc string) []string {
+func StartUp(kubeconfig string, svc string, ns string) []string {
 
     // use the current context in kubeconfig
     config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
@@ -69,7 +68,7 @@ func StartUp(kubeconfig string, svc string) []string {
     }
 
     var pods PodEndpointList
-    err = getEndpoints(clientset, &pods, svc)
+    err = getEndpoints(clientset, &pods, svc, ns)
     if err != nil {
        panic(err.Error())
     }

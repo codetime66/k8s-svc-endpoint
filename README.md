@@ -9,6 +9,8 @@ Usage of ./bin/k8s-svc-endpoint:
 
 
 ./bin/k8s-svc-endpoint --kubeconfig ~/projects/kubeland/hzubernetes/.kube/conf --service-name api/v1/namespaces/credenciamento/endpoints/credenciamento-validacao-telefone
+./bin/k8s-svc-endpoint --service-name api/v1/namespaces/k8s-prometheus-micrometer-demo/endpoints/app-lb
+./bin/k8s-svc-endpoint --service-name app-lb --namespace k8s-prometheus-micrometer-demo
 
 ---------
 #metrics:
